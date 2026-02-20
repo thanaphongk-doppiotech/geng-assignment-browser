@@ -7,7 +7,6 @@ TC_ASM_BROWSER_003 - Verify user can login successfully
     [Documentation]    author: Thanaphong Khaownual
     ...                Verify user can login successfully
     [Tags]      type:training       category:browser
-
     # Open file doppee_shop.html
     common.Open doppee shop website
     # Input username
