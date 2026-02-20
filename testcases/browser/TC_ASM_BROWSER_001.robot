@@ -34,7 +34,7 @@ ${locator.lbl_item_d}               css=ul#item-list li:text-is("Item D")
 TC_ASM_BROWSER_001 - Verify user registration form and interactive UI components
     [Documentation]    Author : Thanaphong Khaownual
     ...                Verify user registration form and interactive UI components
-    [Tags]      type:training       category:css_locator
+    [Tags]      type:training       category:browser
     # 1. Open html file training.html
     Open training html file
     # 2. Fill text in username, email , password
@@ -70,4 +70,3 @@ TC_ASM_BROWSER_001 - Verify user registration form and interactive UI components
     # 11. Take screenshot and close browser
     Browser.Take screenshot
     Browser.Close browser
-    Debug

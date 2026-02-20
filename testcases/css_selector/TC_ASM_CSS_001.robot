@@ -58,4 +58,3 @@ TC_ASM_CSS_001 - Verify user registration form and interactive UI components
     Browser.Highlight elements    selector=${locator.lbl_item_b}
     Browser.Highlight elements    selector=${locator.lbl_item_c}
     Browser.Highlight elements    selector=${locator.lbl_item_d}
-    Debug

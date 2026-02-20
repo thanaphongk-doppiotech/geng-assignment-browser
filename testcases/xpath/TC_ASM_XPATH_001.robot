@@ -32,7 +32,7 @@ ${locator.lbl_item_d}               xpath=//ul[@id="item-list"]//li[text()="Item
 TC_ASM_XPATH_001 - Verify user registration form and interactive UI components
     [Documentation]    Author : Thanaphong Khaownual
     ...                Verify user registration form and interactive UI components
-    [Tags]      type:training       category:css_locator
+    [Tags]      type:training       category:xpath_locator
     # 1. Open html file training.html
     Open training html file
     # 2. Find following element locators (CSS selector) and store in variable section:
@@ -58,4 +58,3 @@ TC_ASM_XPATH_001 - Verify user registration form and interactive UI components
     Browser.Highlight elements    selector=${locator.lbl_item_b}
     Browser.Highlight elements    selector=${locator.lbl_item_c}
     Browser.Highlight elements    selector=${locator.lbl_item_d}
-    Debug
