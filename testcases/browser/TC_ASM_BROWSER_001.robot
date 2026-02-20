@@ -31,8 +31,9 @@ ${locator.lbl_item_c}               css=ul#item-list li.item:has-text("Item C")
 ${locator.lbl_item_d}               css=ul#item-list li:text-is("Item D")
 
 *** Test Cases ***
-TC_ASSIGNMENT_001
-    [Documentation]    To verify that css locator are exist in website
+TC_ASM_BROWSER_001 - Verify user registration form and interactive UI components
+    [Documentation]    Author : Thanaphong Khaownual
+    ...                Verify user registration form and interactive UI components
     [Tags]      type:training       category:css_locator
     # 1. Open html file training.html
     Open training html file

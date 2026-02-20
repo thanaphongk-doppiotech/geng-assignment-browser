@@ -87,8 +87,9 @@ Clear email field by press select all then delete key
     Browser.Press keys      ${locator.txt_email}    Meta+A      Delete  # MAC = Meta+A, Windows = Control+A
 
 *** Test Cases ***
-TC_ASSIGNMENT_001
-    [Documentation]    To verify that css locator are exist in website
+TC_ASM_BROWSER_002 - Verify user registration form and interactive UI components
+    [Documentation]    Author : Thanaphong Khaownual
+    ...                Verify user registration form and interactive UI components
     [Tags]      type:training       category:css_locator
     # 1. Open html file training.html
     Open training html file

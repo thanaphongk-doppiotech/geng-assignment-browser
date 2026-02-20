@@ -29,8 +29,9 @@ ${locator.lbl_item_c}               xpath=//ul[@id="item-list"]//li[@class="item
 ${locator.lbl_item_d}               xpath=//ul[@id="item-list"]//li[text()="Item D"]
 
 *** Test Cases ***
-Verify login success and interact with all element
-    [Documentation]    To verify that css locator are exist in website
+TC_ASM_XPATH_001 - Verify user registration form and interactive UI components
+    [Documentation]    Author : Thanaphong Khaownual
+    ...                Verify user registration form and interactive UI components
     [Tags]      type:training       category:css_locator
     # 1. Open html file training.html
     Open training html file
