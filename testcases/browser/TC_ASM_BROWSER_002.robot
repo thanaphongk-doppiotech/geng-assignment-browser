@@ -32,7 +32,7 @@ Open training html file
     [Documentation]    Open html file
     Browser.New browser     headless=${FALSE}       slowMo=0.25
     Browser.New context     viewport=${NONE}
-    Browser.New page        url=file://${CURDIR}/../../../${local_html_file_name}
+    Browser.New page        url=file://${CURDIR}/../../web_html/${local_html_file_name}
 
 Input username
     [Documentation]    Input username

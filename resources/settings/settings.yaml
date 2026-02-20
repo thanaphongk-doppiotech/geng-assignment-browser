@@ -1,3 +1,4 @@
 doppee_web:
-  url:  file:///Users/thanaphong.k/Documents/Trainings/robot_browser_training_ta/assignment/doppee_shop.html
+  # url:  file:///Users/thanaphong.k/Documents/Trainings/robot_browser_training_ta/assignment/doppee_shop.html
+  file_path:  /../../web_html/doppee_shop.html
   default_timeout:  10s

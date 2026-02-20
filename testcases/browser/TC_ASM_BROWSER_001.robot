@@ -7,7 +7,7 @@ Open training html file
     [Documentation]    Open html file
     Browser.New browser     headless=${FALSE}
     Browser.New context     viewport=${NONE}
-    Browser.New page        url=file://${CURDIR}/../../../${local_html_file_name}
+    Browser.New page        url=file://${CURDIR}/../../web_html/${local_html_file_name}
 
 *** Variables ***
 ${local_html_file_name}             training.html

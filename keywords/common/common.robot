@@ -3,7 +3,8 @@ Open doppee shop website
     [Documentation]    Open website doppee shop
     Browser.New browser     headless=${FALSE}
     Browser.New context     viewport=${NONE}
-    Browser.New page        url=${doppee_web.url}
+    ${url}=                 BuiltIn.Set variable    file://${CURDIR}${doppee_web.file_path}
+    Browser.New page        url=${url}
 
 Format baht currency to number
     [Documentation]     Formats a currency string into an integer value
