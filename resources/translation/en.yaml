@@ -1,3 +1,13 @@
 translation:
   login_page:
     login_success_msg:  Login successfully
+    add_to_cart_success_msg:  Added to cart successfully
+  top_navigation_page:
+    tab_login:
+      label:  Login
+    tab_product_list:
+      label:  Product List
+    tab_product_detail:
+      label:  Product Detail
+    tab_cart:
+      label:  Cart
