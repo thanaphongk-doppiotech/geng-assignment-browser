@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Doppee shop</title>
+  <style>
+    :root{ --bg:#0f172a; --surface:#111827; --muted:#94a3b8; --text:#e5e7eb; --primary:#38bdf8; --ok:#22c55e; --border:#334155; --danger:#ef4444; }
+    *{ box-sizing:border-box }
+    body{ margin:0; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial; background:var(--bg); color:var(--text) }
+    header{ position:sticky; top:0; z-index:10; background:rgba(15,23,42,.85); backdrop-filter:blur(8px); border-bottom:1px solid #1f2937 }
+    .container{ max-width:1000px; margin:0 auto; padding:14px 16px }
+    nav{ display:flex; gap:10px; flex-wrap:wrap }
+    .tab{ padding:8px 12px; border-radius:999px; background:#0b1220; border:1px solid #1f2937; color:var(--text); cursor:pointer }
+    .tab[aria-selected="true"]{ background:var(--primary); color:#062a3b; border-color:transparent; font-weight:700 }
+
+    main{ padding:22px 0 80px }
+    section.page{ display:none }
+    section.page.active{ display:block }
+
+    .card{ background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:16px }
+    label{ display:block; margin:10px 0 6px; font-weight:600 }
+    input, select{ width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border); background:#0b1220; color:var(--text) }
+    select:invalid{ color: var(--muted) }
+    .row{ display:flex; align-items:center; gap:10px }
+    .btn{ display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:12px; border:1px solid var(--border); background:var(--primary); color:#062a3b; font-weight:700; cursor:pointer }
+    .btn.secondary{ background:#1f2937; color:var(--text) }
+    .grid{ display:grid; gap:16px }
+    .cols-2{ grid-template-columns: repeat(2, minmax(0, 1fr)) }
+    @media (max-width:900px){ .cols-2{ grid-template-columns:1fr } }
+    .price{ font-weight:800 }
+
+    table{ width:100%; border-collapse:collapse }
+    th, td{ padding:10px; border-bottom:1px solid var(--border); text-align:left }
+
+    /* popup / toast (centered top) */
+    .toast{ position:fixed; left:50%; top:16px; transform:translateX(-50%);
+            background:#052e13; color:#22c55e; border:2px solid #134e33;
+            padding:16px 24px; border-radius:16px; display:none; z-index:9999;
+            box-shadow: 0 10px 30px rgba(0,0,0,.35); font-size:18px; font-weight:800 }
+
+    /* decoy fields for training */
+    .fake-field{ position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden; pointer-events:none; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container row" style="justify-content:space-between;">
+      <strong class="brand">Doppee Shop</strong>
+      <nav aria-label="Main tabs" class="nav-main">
+        <button class="tab" data-target="#login" aria-controls="login" aria-selected="true">Login</button>
+        <button class="tab" data-target="#list" aria-controls="list">Product List</button>
+        <button class="tab" data-target="#detail" aria-controls="detail" data-disabled="true" title="เลือกสินค้าจาก Product List ก่อน">Product Detail</button>
+        <button class="tab" data-target="#cart" aria-controls="cart">Cart</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Login Page (v6: decoy fields + label-association only) -->
+    <section id="login" class="page active" role="region" aria-label="Login Page">
+      <form class="card" data-testid="form-login">
+        <h3 class="title">เข้าสู่ระบบ</h3>
+
+        <!-- decoy fields (อยู่ใน DOM แต่ซ่อนและ disabled) -->
+        <input class="fake-field username" name="username" autocomplete="off" disabled aria-hidden="true" />
+        <input class="fake-field password" name="password" type="password" autocomplete="off" disabled aria-hidden="true" />
+
+        <!-- real fields ต้องอ้างอิงผ่าน label เท่านั้น (ไม่มี id/ไม่มี data-testid) -->
+        <label class="lbl-username">Username </label>
+        <input class="username" type="text" autocomplete="username" />
+        <label class="lbl-password">Password </label>
+        <input class="password" type="password" autocomplete="current-password" />
+
+        <div class="row" style="justify-content:flex-start; margin-top:6px;">
+          <label class="row" style="gap:8px;">
+            <input class="remember" type="checkbox" />
+            <span>Remember me</span>
+          </label>
+        </div>
+        <div class="row" style="justify-content:flex-end; margin-top:12px;">
+          <button type="submit" class="btn btn-login" data-testid="btn-login">Login</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Product List Page -->
+    <section id="list" class="page" role="region" aria-label="Product List">
+      <div class="card card-search">
+        <div class="row" style="justify-content:space-between; align-items:flex-end;">
+          <div style="flex:1;">
+            <label for="q">Search</label>
+            <!-- ใส่ decoy ซ้อน (ซ่อน) เพื่อหลอก selector ที่ใช้ input[type=search] ตรง ๆ -->
+            <input class="fake-field" type="search" disabled aria-hidden="true" />
+            <input class="search-input" id="q" type="search" placeholder="Search product name..." />
+          </div>
+          <div class="row" style="gap:8px;">
+            <button class="btn search">Search</button>
+            <button class="btn secondary clear">Clear</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid cols-2 product-list" style="margin-top:16px;"></div>
+    </section>
+
+    <!-- Product Detail Page -->
+    <section id="detail" class="page" role="region" aria-label="Product Detail">
+      <div class="card product-detail">
+        <div class="row" style="justify-content:space-between;">
+          <h3 class="detail-name">-</h3>
+          <button class="btn secondary back">ย้อนกลับ</button>
+        </div>
+        <p class="price">ราคา: <span class="detail-price">฿0.00</span></p>
+        <div class="grid cols-2" style="margin-top:12px;">
+          <div>
+            <label>จำนวน</label>
+            <div class="row qty-row">
+              <button class="btn secondary qty-dec" aria-label="ลดจำนวน">-</button>
+              <input class="qty" type="number" min="1" value="1" style="max-width:120px" readonly />
+              <button class="btn secondary qty-inc" aria-label="เพิ่มจำนวน">+</button>
+            </div>
+          </div>
+          <div>
+            <label for="color">สี <span style="color:var(--danger);">*</span></label>
+            <!-- decoy select (ซ่อน) -->
+            <select class="fake-field" disabled aria-hidden="true"><option>fake</option></select>
+            <select class="color" required>
+              <option value="" selected disabled>กรุณาเลือก</option>
+            </select>
+          </div>
+        </div>
+        <div class="row" style="justify-content:flex-end; margin-top:16px;">
+          <button class="btn add-to-cart">Add to cart</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cart Page -->
+    <section id="cart" class="page" role="region" aria-label="Cart Page">
+      <div class="card">
+        <h3>ตะกร้าสินค้า</h3>
+        <table aria-label="Cart table">
+          <thead>
+            <tr>
+              <th>สินค้า</th>
+              <th>สี</th>
+              <th>จำนวน</th>
+              <th>ราคา/ชิ้น</th>
+              <th>รวม</th>
+            </tr>
+          </thead>
+          <tbody class="cart-body"></tbody>
+        </table>
+        <div class="row" style="justify-content:flex-end; margin-top:12px; gap:8px;">
+          <span>ทั้งหมด <strong class="cart-count">0</strong> ชิ้น</span>
+          <button class="btn secondary clear-cart">ล้างตะกร้า</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Popup / Toast -->
+  <div class="toast" role="status" aria-live="polite">Login successfully</div>
+
+  <script>
+    // ------- Router (tabs -> pages) -------
+    const tabs = document.querySelectorAll('button.tab');
+    const pages = document.querySelectorAll('section.page');
+    function show(target){
+      pages.forEach(p=>p.classList.remove('active'));
+      tabs.forEach(t=>t.setAttribute('aria-selected','false'));
+      const el = document.querySelector(target);
+      if(el){ el.classList.add('active'); }
+      const btn = Array.from(tabs).find(t=>t.dataset.target===target);
+      if(btn && btn.getAttribute('data-disabled')!=='true'){ btn.setAttribute('aria-selected','true'); }
+      if(target.startsWith('#')) location.hash = target;
+    }
+    tabs.forEach(t=>{
+      t.addEventListener('click', ()=>{
+        if(t.getAttribute('data-disabled')==='true') return;
+        show(t.dataset.target);
+      });
+    });
+    function enableDetailTab(enable){
+      const tab = Array.from(tabs).find(t=>t.dataset.target==='#detail');
+      if(!tab) return;
+      if(enable){ tab.removeAttribute('data-disabled'); tab.title=''; }
+      else { tab.setAttribute('data-disabled','true'); tab.title='เลือกสินค้าจาก Product List ก่อน'; }
+    }
+
+    // ------- Toast (popup) -------
+    const toastEl = document.querySelector('.toast');
+    function showToast(msg, ms){
+      toastEl.textContent = msg;
+      toastEl.style.display = 'block';
+      setTimeout(()=> toastEl.style.display = 'none', ms);
+    }
+
+    // ------- Login logic (decoy + label association) -------
+    const loginForm = document.querySelector('[data-testid="form-login"]');
+    const REMEMBER_KEY = 'training_shop_remembered_user';
+
+    // preload remembered username if exists
+    // const remembered = localStorage.getItem(REMEMBER_KEY);
+    // if(remembered){
+    //   // อ้างอิงผ่าน label (ไม่ใช้ data-testid/ไม่ใช้ id)
+    //   const userInput = loginForm.querySelector('label.lbl-username > input');
+    //   userInput.value = remembered;
+    //   const chk = loginForm.querySelector('.remember');
+    //   if(chk) chk.checked = true;
+    // }
+
+    loginForm.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      // ดึงค่าผ่านโครงสร้าง label -> input เท่านั้น
+      const userInput = loginForm.querySelector('label.lbl-username + input');
+      const passInput = loginForm.querySelector('label.lbl-password + input');
+      const remember = loginForm.querySelector('.remember')?.checked;
+      const u = (userInput?.value || '').trim();
+      const p = (passInput?.value || '');
+      if(!u || !p){ showToast('กรอกข้อมูลให้ครบ', 2000); return; }
+      if(remember){ localStorage.setItem(REMEMBER_KEY, u); } else { localStorage.removeItem(REMEMBER_KEY); }
+      showToast('Login successfully', 10000);
+      show('#list');
+    });
+
+    // ------- Product data -------
+    const PRODUCTS = [
+      { id:'Keyboard', name:'Keyboard', colors:['Black','White'], price:1890 },
+      { id:'Phone',    name:'Phone',    colors:['Black','Blue'],  price:9900 }
+    ];
+    function fmt(n){ return '฿' + n.toFixed(2); }
+
+    // ------- Product list rendering -------
+    const listContainer = document.querySelector('.product-list');
+    const searchInput = document.querySelector('.card-search .search-input');
+    const searchBtn = document.querySelector('.card-search .search');
+    const clearSearchBtn = document.querySelector('.card-search .clear');
+
+    function renderList(items){
+      listContainer.innerHTML = '';
+      items.forEach(p=>{
+        const card = document.createElement('div');
+        card.className = 'card product-card';
+        card.setAttribute('data-id', p.id); // ไม่มี data-testid ตั้งใจไว้
+        card.innerHTML = `
+          <h3 class="pname">${p.name}</h3>
+          <p class="price">ราคา: <span class="pprice">${fmt(p.price)}</span></p>
+          <div class="row actions">
+            <button class="btn view" aria-label="ดูรายละเอียด ${p.name}">View</button>
+          </div>`;
+        listContainer.appendChild(card);
+      });
+    }
+    renderList(PRODUCTS);
+
+    searchBtn && searchBtn.addEventListener('click', ()=>{
+      const q = (searchInput.value||'').toLowerCase();
+      const filtered = PRODUCTS.filter(p=> p.name.toLowerCase().includes(q));
+      renderList(filtered);
+    });
+    clearSearchBtn && clearSearchBtn.addEventListener('click', ()=>{ searchInput.value=''; renderList(PRODUCTS); });
+
+    // click to detail
+    listContainer && listContainer.addEventListener('click', (e)=>{
+      const btn = e.target.closest('button.view');
+      if(!btn) return;
+      const card = btn.closest('[data-id]');
+      const pid = card.getAttribute('data-id');
+      const p = PRODUCTS.find(x=>x.id===pid);
+      openDetail(p);
+    });
+
+    // ------- Product detail -------
+    let currentProduct = null;
+    const detailRoot = document.querySelector('.product-detail');
+
+    function openDetail(product){
+      currentProduct = product;
+      enableDetailTab(true);
+      detailRoot.querySelector('.detail-name').textContent = product.name;
+      detailRoot.querySelector('.detail-price').textContent = fmt(product.price);
+      const colorSel = detailRoot.querySelector('.color');
+      colorSel.innerHTML = '<option value="" selected disabled>กรุณาเลือก</option>';
+      product.colors.forEach(c=>{
+        const opt = document.createElement('option');
+        opt.value = c; opt.textContent = c; colorSel.appendChild(opt);
+      });
+      detailRoot.querySelector('.qty').value = '1';
+      show('#detail');
+    }
+
+    // ปุ่ม +/- จำนวน
+    detailRoot.querySelector('.qty-inc').addEventListener('click', ()=>{
+      const input = detailRoot.querySelector('.qty');
+      input.value = String(Math.max(1, parseInt(input.value||'1',10) + 1));
+    });
+    detailRoot.querySelector('.qty-dec').addEventListener('click', ()=>{
+      const input = detailRoot.querySelector('.qty');
+      input.value = String(Math.max(1, parseInt(input.value||'1',10) - 1));
+    });
+
+    detailRoot.querySelector('.back').addEventListener('click', ()=>{ show('#list'); });
+
+    // ------- Cart -------
+    // key = `${id}__${color}` ; value = {id, name, color, qty, price}
+    const CART = new Map();
+    const cartBody = document.querySelector('.cart-body');
+    const cartCount = document.querySelector('.cart-count');
+    const btnClearCart = document.querySelector('.clear-cart');
+
+    function addToCart(prod, color, qty){
+      const key = prod.id + '__' + color;
+      const exist = CART.get(key) || { id: prod.id, name: prod.name, color, qty:0, price: prod.price };
+      exist.qty += qty;
+      CART.set(key, exist);
+      renderCart();
+    }
+
+    function renderCart(){
+      if(!cartBody) return;
+      cartBody.innerHTML = '';
+      let totalCount = 0;
+      for(const [k, item] of CART){
+        totalCount += item.qty;
+        const sum = item.qty * item.price;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="cname">${item.name}</td>
+          <td class="ccolor">${item.color}</td>
+          <td class="cqty">${item.qty}</td>
+          <td class="cunit">${fmt(item.price)}</td>
+          <td class="csum">${fmt(sum)}</td>`;
+        cartBody.appendChild(tr);
+      }
+      if(cartCount) cartCount.textContent = String(totalCount);
+    }
+
+    detailRoot.querySelector('.add-to-cart').addEventListener('click', ()=>{
+      if(!currentProduct) return;
+      const color = detailRoot.querySelector('.color').value;
+      if(!color){ showToast('กรุณาเลือกสี', 2000); return; }
+      const qty = Math.max(1, parseInt(detailRoot.querySelector('.qty').value||'1',10));
+      addToCart(currentProduct, color, qty);
+      showToast('Added to cart successfully', 2000);
+    });
+
+    btnClearCart && btnClearCart.addEventListener('click', ()=>{ CART.clear(); renderCart(); });
+
+    // initial hash route
+    if(location.hash){ show(location.hash); }
+  </script>
+</body>
+</html>
